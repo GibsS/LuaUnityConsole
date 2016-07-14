@@ -1,0 +1,30 @@
+TODO:
+=====
+
+[-] Proper history movement with arrow
+[-] Remove scroll bars in history
+[-] Add "stick to bottom" for history
+[-] Add hide and show command in default commands
+[-] Add support for multiline console definition of tables
+[-] Add script search path
+-? Add support for tab in editor (it's actually quite convenient to be able to change gui element with a tab..)
+
+Polishing Graphics:
+===================
+> The console now uses Imgui, it is therefore hard to polish. These improvement would add graphical elements and make it easier to create
+> other graphical implementation of the console
+
+- Move to a cleaner MVC model
+- Add colour to log
+
+Polishing Code: 
+===============
+> The point of these is to increase the quantity of coding functunality the console offers, this would be done by
+> a parser which would (1) : test certain element of correction (2) : interpretet certain extra element into lua code before it
+> is executed
+
+- Add dialect element :
+	- command structure
+	- easy access to gameobjects
+	- easy access to components of object (not have to use getComponent)
+- Add correction for partial command line
