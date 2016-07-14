@@ -1,5 +1,6 @@
 # LuaUnityConsole
-A simple lua console for Unity3D that uses NLua 
+A simple lua console for Unity3D that uses Mervill's Integration of NLua to Unity3D 
+(https://github.com/Mervill/Unity3D-NLua)
 
 This can be a practical tool, whether you want to implement simple debugging functionality like 
 object spawning and teleportation or if you want to implement quick and dirty first version of features 
