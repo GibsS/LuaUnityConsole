@@ -8,6 +8,7 @@ using System;
 
 public class LuaConsole : MonoBehaviour {
 
+    // CONSTANTS
     const int MARGIN = 10;
     const int EDITOR_HEIGHT = 160;
     const int HISTORY_LABEL_HEIGHT = 22;
@@ -17,16 +18,18 @@ public class LuaConsole : MonoBehaviour {
 
     const int CONSOLE_HEIGHT = 20;
 
+    public Lua lua { get; private set; }
+
+    // SINGLETON INSTANCE
     public static LuaConsole luaConsole;
 
+    // HISTORY
     List<string> history;
     int historyRank;
     string commandSave;
-
     Vector2 logScroll;
 
-    public Lua lua { get; private set; }
-
+    // MULTI LINE COMMAND
     List<string> currentConsoleCode;
     int parDepth;
     int acoDepth;
@@ -34,14 +37,14 @@ public class LuaConsole : MonoBehaviour {
 
     string uri;
     string codeEditor;
+    string scriptBase;
 
+    // SHOW/HIDE
     bool showLuaConsole;
     bool showLuaEditor;
     bool showLuaHistory;
-
-    string scriptBase;
-
-    // positionning
+    
+    // GUI ELEMENT POSITIONNING
     Rect mainBox;
     Rect historyBox;
     Rect consoleBox;
@@ -50,11 +53,8 @@ public class LuaConsole : MonoBehaviour {
     int cacheScreenWidth;
     int cacheScreenHeight;
 
-    GUIStyle gray1;
-    GUIStyle gray2;
-
 	void Start () {
-        // Assure unicity
+        // Assure uniqueness
         if(luaConsole != null)
         {
             Debug.Log("There is already a LuaConsole");
@@ -76,30 +76,24 @@ public class LuaConsole : MonoBehaviour {
         currentConsoleCommand = "";
 
         codeEditor = "";
+        uri = null;
+        scriptBase = null;
 
         showLuaConsole = true;
         showLuaEditor = true;
         showLuaHistory = true;
 
-        scriptBase = null;
-
         mainBox = new Rect();
         historyBox = new Rect();
         consoleBox = new Rect();
         editorBox = new Rect();
-
-        runString(@"import 'System'
-                    import 'UnityEngine'");
-        registerAllCommands();
-
         updatePositions();
         cacheScreenHeight = Screen.height;
         cacheScreenWidth = Screen.width;
 
-        gray1 = new GUIStyle();
-        gray2 = new GUIStyle();
-        gray1.normal.background = MakeTex(1, 1, new Color(0.5f, 0.5f, 0.5f, 0.4f));
-        gray2.normal.background = MakeTex(1, 1, new Color(0.7f, 0.7f, 0.7f, 0.4f));
+        runString(@"import 'System'
+                    import 'UnityEngine'");
+        registerAllCommands();
     }
     void OnGUI()
     {
@@ -169,6 +163,7 @@ public class LuaConsole : MonoBehaviour {
         }
     }
 
+    #region GUI Positionning
     void updatePositions()
     {
         // main box
@@ -220,7 +215,9 @@ public class LuaConsole : MonoBehaviour {
         consoleBox.width = mainBox.width - 2 * MARGIN;
         consoleBox.height = CONSOLE_HEIGHT;
     }
+    #endregion
 
+    #region Show/Hide
     public void showConsole()
     {
         showLuaConsole = true;
@@ -250,7 +247,9 @@ public class LuaConsole : MonoBehaviour {
         showLuaHistory = false;
         updatePositions();
     }
+    #endregion
 
+    #region Commands
     void runCurrentCommand()
     {
         int If = Regex.Matches(currentConsoleCommand, @"([\n\ \t]|^)if([\n\ \t]|$)").Count;
@@ -407,9 +406,18 @@ public class LuaConsole : MonoBehaviour {
     }
     new void print(object obj)
     {
-        printMessage(obj.ToString());
+        if (obj == null)
+        {
+            printMessage("null");
+        }
+        else
+        {
+            printMessage(obj.ToString());
+        }
     }
+    #endregion
 
+    #region Scripts
     public void setScriptRoot(string URI)
     {
         scriptBase = URI;
@@ -483,7 +491,9 @@ public class LuaConsole : MonoBehaviour {
             printError(e.Message);
         }
     }
+    #endregion
 
+    #region Registration
     void registerAllCommands()
     {
         registerCommand("show_editor", "showEditor");
@@ -520,13 +530,15 @@ public class LuaConsole : MonoBehaviour {
     {
         runString(@"import '" + ns + @"'");
     }
+    #endregion
 
-    public static string FormatException(NLua.Exceptions.LuaException e)
+    #region helpers
+    static string FormatException(NLua.Exceptions.LuaException e)
     {
         string source = (string.IsNullOrEmpty(e.Source)) ? "<no source>" : e.Source.Substring(0, e.Source.Length - 2);
         return string.Format("{0}\nLua (at {2})", e.Message, string.Empty, source);
     }
-    private Texture2D MakeTex(int width, int height, Color col)
+    Texture2D MakeTex(int width, int height, Color col)
     {
         Color[] pix = new Color[width * height];
 
@@ -539,4 +551,5 @@ public class LuaConsole : MonoBehaviour {
 
         return result;
     }
+    #endregion
 }
