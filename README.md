@@ -20,7 +20,6 @@ console.registerNamespace("System.IO");
 // register the default location where scripts are saved
 console.setScriptRoot("Some_absolute_path");
 ```
-4. Enjoy
 
 # "Native" functions
 
