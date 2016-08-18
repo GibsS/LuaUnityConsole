@@ -23,10 +23,12 @@ public class ConsoleModel {
     public event OnShow onShowAll;
     public event OnShow onShowEditor;
     public event OnShow onShowHistory;
+    public event OnShow onShowLog;
 
     public event OnHide onHideConsole;
     public event OnHide onHideEditor;
     public event OnHide onHideHistory;
+    public event OnHide onHideLog;
 
     public event OnClear onClear;
 
@@ -273,12 +275,16 @@ public class ConsoleModel {
     public void showHistory () { if(onShowHistory != null) { onShowHistory (); } }
     public void hideHistory () { if(onHideHistory != null) { onHideHistory (); } }
     public void hideConsole () { if(onHideConsole != null) { onHideConsole (); } }
+    public void showLog () { if (onShowLog != null) { onShowLog (); } }
+    public void hideLog () { if (onHideLog != null) { onHideLog (); } }
 
     #endregion
 
     #region Registration
 
     void registerAllCommands () {
+        registerCommand ("show_log", "showLog");
+        registerCommand ("hide_log", "hideLog");
         registerCommand ("show_editor", "showEditor");
         registerCommand ("hide_editor", "hideEditor");
         registerCommand ("show_history", "showHistory");

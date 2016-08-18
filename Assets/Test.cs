@@ -8,11 +8,7 @@ public class Test : MonoBehaviour {
         LuaConsole.init ();
         LuaConsole.setScriptRoot (Application.dataPath + "/TestScript");
 
-        LuaConsole.print ("test");
-
-        LuaConsole.runCode ("print 'test'");
-
-        StartCoroutine (test ());
+        //StartCoroutine (test ());
 	}
 
     IEnumerator test () {
@@ -23,6 +19,7 @@ public class Test : MonoBehaviour {
             yield return new WaitForSeconds (1);
             LuaConsole.info ("test", this, "network");
             yield return new WaitForSeconds (1);
+            Debug.Log ("un message unity");
         }
     }
 }

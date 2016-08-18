@@ -122,9 +122,15 @@ public class LuaConsole {
             editorModel.showHistory ();
         }
     }
+    public static void showLog() {
+        if(loggerModel != null) {
+            loggerModel.show ();
+        }
+    }
     public static void showAll() {
         showHistory ();
         showEditor ();
+        showLog ();
     }
     public static void hideEditor() {
         if (consoleModel != null) {
@@ -142,9 +148,15 @@ public class LuaConsole {
             editorModel.hideHistory ();
         }
     }
+    public static void hideLog() {
+        if (loggerModel != null) {
+            loggerModel.hide ();
+        }
+    }
     public static void hideAll() {
         hideEditor ();
         hideHistory ();
+        hideLog ();
     }
 
     public static string loadScript(string URI) {

@@ -9,6 +9,20 @@ public class StringToBoolDict : SerializableDictionary<string, bool> { }
 [Serializable]
 public class LoggerModel {
 
+    public delegate void OnShow ();
+    public delegate void OnHide ();
+    public delegate void OnLog (Log log);
+    public delegate void OnClear ();
+    public delegate void OnTypeChange (LogType type, bool active);
+    public delegate void OnChannelChange (string channel, bool active);
+
+    public event OnShow onShow;
+    public event OnHide onHide;
+    public event OnLog onLog;
+    public event OnClear onClear;
+    public event OnTypeChange onTypeChange;
+    public event OnChannelChange onChannelChange;
+
     const int MAX_HISTORY = 500;
     const int AVERAGE_HISTORY = 300;
     
@@ -34,6 +48,30 @@ public class LoggerModel {
             typeOn[i] = true;
         }
         logTypeNames = new string[] { "info", "error", "warning", "test", "exception" };
+        
+        Application.logMessageReceived += handleUnityLog;
+    }
+
+    void handleUnityLog (string condition, string stackTrace, UnityEngine.LogType unityLogType) {
+        LogType logType = LogType.info;
+        switch (unityLogType) {
+            case UnityEngine.LogType.Error:
+                logType = LogType.error;
+                break;
+            case UnityEngine.LogType.Assert:
+                logType = LogType.exception;
+                break;
+            case UnityEngine.LogType.Warning:
+                logType = LogType.warning;
+                break;
+            case UnityEngine.LogType.Log:
+                logType = LogType.info;
+                break;
+            case UnityEngine.LogType.Exception:
+                logType = LogType.exception;
+                break;
+        }
+        addLog (new Log (logType, null, "Unity", condition, stackTrace));
     }
 
     public void addLog(Log log) {
@@ -46,9 +84,15 @@ public class LoggerModel {
         if(logs.Count > MAX_HISTORY) {
             logs.RemoveRange (0, logs.Count - AVERAGE_HISTORY);
         }
+        if(onLog != null) {
+            onLog (log);
+        }
     }
     public void clear() {
         logs.Clear ();
+        if(onClear != null) {
+            onClear ();
+        }
     }
     public IEnumerable getLogs() {
         foreach(Log log in logs) {
@@ -60,14 +104,37 @@ public class LoggerModel {
 
     public void enableType(LogType type) {
         typeOn[(int) type] = true;
+        if(onTypeChange != null) {
+            onTypeChange (type, true);
+        }
     }
     public void disableType(LogType type) {
         typeOn[(int) type] = false;
+        if (onTypeChange != null) {
+            onTypeChange (type, false);
+        }
     }
     public void enableChannel(string channel) {
         visibleChannels.Add (channel);
+        if (onTypeChange != null) {
+            onChannelChange (channel, true);
+        }
     }
     public void disableChannel(string channel) {
         visibleChannels.Remove (channel);
+        if (onTypeChange != null) {
+            onChannelChange (channel, true);
+        }
+    }
+
+    public void show() {
+        if(onShow != null) {
+            onShow ();
+        }
+    }
+    public void hide() {
+        if(onHide != null) {
+            onHide ();
+        }
     }
 }

@@ -45,6 +45,10 @@ public class Log {
         line = 0;
         file = "";
     }
+
+    public override string ToString() {
+        return "[" + (target != null ? target + ":" : "") + (channel != "" ? channel : "Default") + "] " + msg;
+    }
 }
 
 public enum LogType {
