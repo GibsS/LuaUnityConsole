@@ -1,3 +1,5 @@
+Currently being updated, this README is out of date.
+
 # LuaUnityConsole
 A simple lua console for Unity3D that uses Mervill's Integration of NLua to Unity3D 
 (https://github.com/Mervill/Unity3D-NLua)
