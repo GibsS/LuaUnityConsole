@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class Test : MonoBehaviour {
 
@@ -8,7 +9,10 @@ public class Test : MonoBehaviour {
         LuaConsole.init ();
         LuaConsole.setScriptRoot (Application.dataPath + "/TestScript");
 
-        //StartCoroutine (test ());
+        StartCoroutine (test ());
+
+        LuaConsole.info ("in g");
+        f ();
 	}
 
     IEnumerator test () {
@@ -21,5 +25,12 @@ public class Test : MonoBehaviour {
             yield return new WaitForSeconds (1);
             Debug.Log ("un message unity");
         }
+    }
+
+    void f () {
+        g ();
+    }
+    void g() {
+        LuaConsole.info ("in g");
     }
 }

@@ -71,7 +71,7 @@ public class LoggerModel {
                 logType = LogType.exception;
                 break;
         }
-        addLog (new Log (logType, null, "Unity", condition, stackTrace));
+        addLog (new Log (logType, null, "Unity", condition, new List<string> () { stackTrace }));
     }
 
     public void addLog(Log log) {

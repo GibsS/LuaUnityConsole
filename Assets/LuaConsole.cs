@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 public class LuaConsole {
@@ -193,8 +194,11 @@ public class LuaConsole {
         }
     }
 
-    static string formatStack(string stack) {
-        return stack;
+    static List<string> formatStack(string stack) {
+        return stack.Split ('\n')
+                    .Except (new List<string> () { "" })
+                    .Skip (2)
+                    .ToList ();
     }
     public static void info (string msg) {
         if(loggerModel != null) {

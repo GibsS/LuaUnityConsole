@@ -154,6 +154,11 @@ public class GameConsole : MonoBehaviour {
             if (showLuaLog) {
                 LoggerModel logger = LuaConsole.getLoggerModel ();
                 if(logger != loggerModel) {
+                    if (loggerModel != null) {
+                        foreach (Log log in loggerModel.logs) {
+                            logger.addLog (log);
+                        }
+                    }
                     loggerModel = logger;
                     loggerModel.onLog += (log => newLog = true);
                     loggerModel.onHide += (() => showLuaLog = false);

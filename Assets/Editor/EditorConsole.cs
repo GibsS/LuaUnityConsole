@@ -46,11 +46,23 @@ public class EditorConsole : EditorWindow {
     Vector2 historyScroll;
     [SerializeField]
     Vector2 logScroll;
+    [SerializeField]
+    Vector2 stackScroll;
 
     [SerializeField]
     bool newPrint;
     [SerializeField]
     bool newLog;
+    
+    [SerializeField]
+    Log selectedLog;
+    [SerializeField]
+    Log hoverLog;
+
+    [SerializeField]
+    int selectedStack;
+    [SerializeField]
+    int hoverStack;
 
     int windowCount { get { return (showEditor ? 1 : 0) + (showHistory ? 1 : 0) + (showLog ? 1 : 0); } }
     int editorWidth { get { return (int) (position.width / windowCount); } }
@@ -108,8 +120,34 @@ public class EditorConsole : EditorWindow {
     void OnGUI() {
         GUIStyle gray1 = new GUIStyle();
         GUIStyle gray2 = new GUIStyle();
+        GUIStyle selected = new GUIStyle();
+        GUIStyle hover = new GUIStyle();
         gray1.normal.background = MakeTex (1, 1, new Color (0.75f, 0.75f, 0.75f));
         gray2.normal.background = MakeTex (1, 1, new Color (0.8f, 0.8f, 0.8f));
+        selected.normal.background = MakeTex (1, 1, new Color (0.6f, 0.6f, 0.7f));
+        hover.normal.background = MakeTex (1, 1, new Color (0.72f, 0.72f, 0.72f));
+
+        GUIStyle[] logTypeFont = new GUIStyle[Enum.GetValues(typeof(LogType)).Length];
+        GUIStyle fontStyle = new GUIStyle();
+        fontStyle.normal.textColor = Color.red;
+        logTypeFont[(int) LogType.error] = fontStyle;
+        fontStyle = new GUIStyle();
+        fontStyle.normal.textColor = Color.blue;
+        logTypeFont[(int) LogType.info] = fontStyle;
+        fontStyle = new GUIStyle();
+        fontStyle.normal.textColor = Color.yellow;
+        logTypeFont[(int) LogType.warning] = fontStyle;
+        fontStyle = new GUIStyle();
+        fontStyle.normal.textColor = Color.magenta;
+        logTypeFont[(int) LogType.exception] = fontStyle;
+        fontStyle = new GUIStyle ();
+        fontStyle.normal.textColor = Color.white;
+        logTypeFont[(int) LogType.test] = fontStyle;
+
+        GUIStyle messagePrint = new GUIStyle();
+        messagePrint.normal.textColor = new Color (0.3f, 0.3f, 0.3f);
+        GUIStyle errorPrint = new GUIStyle();
+        errorPrint.normal.textColor = new Color (1, 0.3f, 0.3f);
 
         LuaConsole.setLoggerModel (loggerModel);
         
@@ -208,7 +246,13 @@ public class EditorConsole : EditorWindow {
                 } else {
                     EditorGUILayout.BeginHorizontal (gray2);
                 }
-                EditorGUILayout.LabelField (consoleModel.history[i]);
+                if (consoleModel.history[i][0] == ' ') {
+                    EditorGUILayout.LabelField (consoleModel.history[i], messagePrint);
+                } else if (consoleModel.history[i][0] == '!') {
+                    EditorGUILayout.LabelField (consoleModel.history[i], errorPrint);
+                } else {
+                    EditorGUILayout.LabelField (consoleModel.history[i]);
+                }
                 EditorGUILayout.EndHorizontal ();
             }
 
@@ -225,19 +269,27 @@ public class EditorConsole : EditorWindow {
         if (showLog) {
             EditorGUILayout.BeginVertical (GUILayout.Width (logWidth), GUILayout.Height (position.height - 60));
 
+            EditorGUILayout.BeginHorizontal ();
+
             logScroll = GUILayout.BeginScrollView (logScroll);
             int i = 0;
             foreach (Log log in loggerModel.getLogs ()) {
-                if (i % 2 == 0) {
-                    EditorGUILayout.BeginHorizontal (gray1);
+                if (log == selectedLog) {
+                    EditorGUILayout.BeginHorizontal (selected);
+                } else if (log == hoverLog) {
+                    EditorGUILayout.BeginHorizontal (hover);
                 } else {
-                    EditorGUILayout.BeginHorizontal (gray2);
+                    if (i % 2 == 0) {
+                        EditorGUILayout.BeginHorizontal (gray1);
+                    } else {
+                        EditorGUILayout.BeginHorizontal (gray2);
+                    }
                 }
 
                 EditorGUILayout.BeginVertical (GUILayout.Width (70));
 
                 EditorGUILayout.BeginHorizontal ();
-                EditorGUILayout.LabelField (log.type.ToString ());
+                EditorGUILayout.LabelField (log.type.ToString (), logTypeFont[(int) log.type]);
                 EditorGUILayout.EndHorizontal ();
 
                 EditorGUILayout.BeginHorizontal ();
@@ -254,6 +306,24 @@ public class EditorConsole : EditorWindow {
 
                 EditorGUILayout.EndHorizontal ();
 
+                if (GUILayoutUtility.GetLastRect ().Contains (Event.current.mousePosition)) {
+                    hoverLog = log;
+                    if (Event.current.type == EventType.mouseDown) {
+                        selectedLog = log;
+                        selectedStack = -1;
+                        hoverStack = -1;
+                    }
+                    if (Event.current.clickCount >= 2) {
+                        string file;
+                        int line;
+                        log.getLineAndFile (out line, out file);
+                        //Debug.Log(file + " " + line);
+                        if (line >= 0) {
+                            UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal (file, line);
+                        }
+                    }
+                }
+
                 i++;
             }
 
@@ -261,8 +331,50 @@ public class EditorConsole : EditorWindow {
                 logScroll.y = float.PositiveInfinity;
                 newLog = false;
             }
-
             GUILayout.EndScrollView ();
+
+            EditorGUILayout.EndHorizontal ();
+
+            if (selectedLog != null && loggerModel.logs.Contains(selectedLog)) {
+                EditorGUILayout.BeginHorizontal (GUILayout.Height (position.height * 1 / 5));
+                stackScroll = EditorGUILayout.BeginScrollView (stackScroll);
+
+                for (int j = 0; j < selectedLog.stack.Count; j++) {
+                    if (j == selectedStack) {
+                        EditorGUILayout.BeginHorizontal (selected);
+                    } else if (j == hoverStack) {
+                        EditorGUILayout.BeginHorizontal (hover);
+                    } else {
+                        if (j % 2 == 0) {
+                            EditorGUILayout.BeginHorizontal (gray1);
+                        } else {
+                            EditorGUILayout.BeginHorizontal (gray2);
+                        }
+                    }
+                    EditorGUILayout.LabelField (selectedLog.stack[j]);
+                    EditorGUILayout.EndHorizontal ();
+
+                    if (GUILayoutUtility.GetLastRect ().Contains (Event.current.mousePosition)) {
+                        hoverStack = j;
+                        if (Event.current.type == EventType.mouseDown) {
+                            selectedStack = j;
+                        }
+                        if (Event.current.clickCount >= 2) {
+                            string file;
+                            int line;
+                            selectedLog.getLineAndFile (j, out line, out file);
+                            //Debug.Log(file + " " + line);
+                            if (line >= 0) {
+                                UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal (file, line);
+                            }
+                        }
+                    }
+                }
+
+                EditorGUILayout.EndScrollView ();
+                EditorGUILayout.EndHorizontal ();
+            }
+
             EditorGUILayout.EndVertical ();
         }
 
