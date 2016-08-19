@@ -179,6 +179,7 @@ public class EditorConsole : EditorWindow {
         if (consoleModel == null) {
             OnEnable ();
         }
+
         // TOOLBAR
         EditorGUILayout.BeginHorizontal (EditorStyles.toolbar);
 

@@ -202,12 +202,12 @@ public class LuaConsole {
     }
     public static void info (string msg) {
         if(loggerModel != null) {
-            loggerModel.addLog (new Log (LogType.info, msg, formatStack(Environment.StackTrace)));
+            loggerModel.addLog (new Log (LogType.info, null, "Default", msg, formatStack(Environment.StackTrace)));
         }
     }
     public static void info (string msg, object target) {
         if (loggerModel != null) {
-            loggerModel.addLog (new Log (LogType.info, target, msg, formatStack (Environment.StackTrace)));
+            loggerModel.addLog (new Log (LogType.info, target, "Default", msg, formatStack (Environment.StackTrace)));
         }
     }
     public static void info (string msg, object target, string channel) {

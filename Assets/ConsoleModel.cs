@@ -44,7 +44,7 @@ public class ConsoleModel {
     public Lua lua { get; private set; }
 
     [SerializeField]
-    public List<string> history { get; private set; }
+    public List<string> history;
 
     [SerializeField]
     string scriptBase;

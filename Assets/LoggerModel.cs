@@ -4,9 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class StringToBoolDict : SerializableDictionary<string, bool> { }
-
-[Serializable]
 public class LoggerModel {
 
     public delegate void OnShow ();
