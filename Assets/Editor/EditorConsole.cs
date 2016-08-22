@@ -64,6 +64,16 @@ public class EditorConsole : EditorWindow {
     [SerializeField]
     int hoverStack;
 
+    [SerializeField]
+    bool noStack;
+
+    //[SerializeField]
+    //bool enterDown;
+    //[SerializeField]
+    //bool upDown;
+    //[SerializeField]
+    //bool downDown;
+
     int windowCount { get { return (showEditor ? 1 : 0) + (showHistory ? 1 : 0) + (showLog ? 1 : 0); } }
     int editorWidth { get { return (int) (position.width / windowCount); } }
     int historyWidth { get { return (int) (position.width / windowCount); } }
@@ -118,6 +128,34 @@ public class EditorConsole : EditorWindow {
     }
 
     void OnGUI() {
+        int historyCount = consoleModel.history.Count;
+        int logCount = loggerModel.logs.Count;
+        if (Event.current.keyCode == KeyCode.Return && Event.current.type == EventType.KeyUp) {// && !enterDown) {
+            //Debug.Log ("Event type : " + Event.current.type);
+            //enterDown = true;
+            consoleModel.runCurrentCommand (currentConsoleCode, currentConsoleCommand, ref parDepth, ref acoDepth);
+            currentConsoleCommand = "";
+            historyRank = -1;
+            commandSave = null;
+
+        }
+        //if (Event.current.keyCode == KeyCode.Return && Event.current.type == EventType.KeyUp) {
+        //    enterDown = false;
+        //}
+
+        //if (Event.current.keyCode == KeyCode.UpArrow && Event.current.type == EventType.KeyUp) {
+        //    //Debug.Log ("up before : " + historyRank + " " + currentConsoleCommand);
+        //    consoleModel.getPreviousCommand (ref historyRank, ref currentConsoleCommand, ref commandSave);
+        //    //Debug.Log ("up after : " + historyRank + " " + currentConsoleCommand);
+        //} else if (Event.current.keyCode == KeyCode.DownArrow && Event.current.type == EventType.KeyUp) {
+        //    //Debug.Log ("down before : " + historyRank + " " + currentConsoleCommand);
+        //    consoleModel.getNextCommand (ref historyRank, ref currentConsoleCommand, ref commandSave);
+        //    //Debug.Log ("down after : " + historyRank + " " + currentConsoleCommand);
+        //}
+        //EditorGUI.FocusTextInControl ("console");
+
+        noStack = false;
+
         GUIStyle gray1 = new GUIStyle();
         GUIStyle gray2 = new GUIStyle();
         GUIStyle selected = new GUIStyle();
@@ -150,31 +188,6 @@ public class EditorConsole : EditorWindow {
         errorPrint.normal.textColor = new Color (1, 0.3f, 0.3f);
 
         LuaConsole.setLoggerModel (loggerModel);
-        
-        Repaint ();
-        
-        if (Event.current.type == EventType.Layout) {
-            if (GUI.GetNameOfFocusedControl () == "console") {
-                if (Event.current.keyCode == KeyCode.Return) {
-                    if (currentConsoleCommand != "") {
-                        consoleModel.runCurrentCommand (currentConsoleCode, currentConsoleCommand, ref parDepth, ref acoDepth);
-                        currentConsoleCommand = "";
-                        historyRank = -1;
-                        commandSave = null;
-                    }
-                }
-
-                if (Event.current.keyCode == KeyCode.UpArrow && Event.current.type == EventType.keyDown) {
-                    Debug.Log ("up : " + historyRank);
-                    consoleModel.getPreviousCommand (ref historyRank, ref currentConsoleCommand, ref commandSave);
-                } else if (Event.current.keyCode == KeyCode.DownArrow) {
-                    Debug.Log ("down");
-                    consoleModel.getNextCommand (ref historyRank, ref currentConsoleCommand, ref commandSave);
-                }
-
-                EditorGUI.FocusTextInControl ("console");
-            }
-        }
 
         if (consoleModel == null) {
             OnEnable ();
@@ -241,7 +254,7 @@ public class EditorConsole : EditorWindow {
             EditorGUILayout.BeginVertical (GUILayout.Width (historyWidth), GUILayout.Height (position.height - 60));
 
             historyScroll = GUILayout.BeginScrollView (historyScroll);
-            for (int i = 0; i < consoleModel.history.Count; i++) {
+            for (int i = 0; i < historyCount; i++) {
                 if (i % 2 == 0) {
                     EditorGUILayout.BeginHorizontal (gray1);
                 } else {
@@ -275,57 +288,63 @@ public class EditorConsole : EditorWindow {
             logScroll = GUILayout.BeginScrollView (logScroll);
             int i = 0;
             foreach (Log log in loggerModel.getLogs ()) {
-                if (log == selectedLog) {
-                    EditorGUILayout.BeginHorizontal (selected);
-                } else if (log == hoverLog) {
-                    EditorGUILayout.BeginHorizontal (hover);
-                } else {
-                    if (i % 2 == 0) {
-                        EditorGUILayout.BeginHorizontal (gray1);
+                if (i < logCount) {
+                    if (log == selectedLog) {
+                        EditorGUILayout.BeginHorizontal (selected);
+                    } else if (log == hoverLog) {
+                        EditorGUILayout.BeginHorizontal (hover);
                     } else {
-                        EditorGUILayout.BeginHorizontal (gray2);
-                    }
-                }
-
-                EditorGUILayout.BeginVertical (GUILayout.Width (70));
-
-                EditorGUILayout.BeginHorizontal ();
-                EditorGUILayout.LabelField (log.type.ToString (), logTypeFont[(int) log.type]);
-                EditorGUILayout.EndHorizontal ();
-
-                EditorGUILayout.BeginHorizontal ();
-                EditorGUILayout.LabelField ("[" + (log.target != null ? log.target + ":" : "") + (log.channel != "" ? log.channel : "Default") + "]");
-                EditorGUILayout.EndHorizontal ();
-
-                EditorGUILayout.EndVertical ();
-
-                EditorGUILayout.BeginVertical ();
-                EditorGUILayout.LabelField (log.msg);
-                EditorGUILayout.EndVertical ();
-
-                //EditorGUILayout.LabelField (log.ToString());
-
-                EditorGUILayout.EndHorizontal ();
-
-                if (GUILayoutUtility.GetLastRect ().Contains (Event.current.mousePosition)) {
-                    hoverLog = log;
-                    if (Event.current.type == EventType.mouseDown) {
-                        selectedLog = log;
-                        selectedStack = -1;
-                        hoverStack = -1;
-                    }
-                    if (Event.current.clickCount >= 2) {
-                        string file;
-                        int line;
-                        log.getLineAndFile (out line, out file);
-                        //Debug.Log(file + " " + line);
-                        if (line >= 0) {
-                            UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal (file, line);
+                        if (i % 2 == 0) {
+                            EditorGUILayout.BeginHorizontal (gray1);
+                        } else {
+                            EditorGUILayout.BeginHorizontal (gray2);
                         }
                     }
-                }
 
-                i++;
+                    EditorGUILayout.BeginVertical (GUILayout.Width (70));
+
+                    EditorGUILayout.BeginHorizontal ();
+                    EditorGUILayout.LabelField (log.type.ToString (), logTypeFont[(int) log.type], GUILayout.Height (8));
+                    EditorGUILayout.EndHorizontal ();
+
+                    EditorGUILayout.BeginHorizontal ();
+                    EditorGUILayout.LabelField ("[" + (log.target != null ? log.target + ":" : "") + (log.channel != "" ? log.channel : "Default") + "]");
+                    EditorGUILayout.EndHorizontal ();
+
+                    EditorGUILayout.EndVertical ();
+
+                    EditorGUILayout.BeginVertical ();
+                    EditorGUILayout.LabelField (log.msg);
+                    EditorGUILayout.EndVertical ();
+
+                    //EditorGUILayout.LabelField (log.ToString());
+
+                    EditorGUILayout.EndHorizontal ();
+
+                    if (GUILayoutUtility.GetLastRect ().Contains (Event.current.mousePosition)) {
+                        hoverLog = log;
+                        if (Event.current.type == EventType.mouseDown) {
+                            if (selectedLog == null && loggerModel.logs.Contains (selectedLog) || selectedLog != log) {
+                                // fix : resolves the problem of layout change during a given unity repaint event
+                                noStack = true;
+                            }
+                            selectedLog = log;
+                            selectedStack = -1;
+                            hoverStack = -1;
+                        }
+                        if (Event.current.clickCount >= 2) {
+                            string file;
+                            int line;
+                            log.getLineAndFile (out line, out file);
+                            //Debug.Log(file + " " + line);
+                            if (line >= 0) {
+                                UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal (file, line);
+                            }
+                        }
+                    }
+
+                    i++;
+                }
             }
 
             if (newLog) {
@@ -336,7 +355,7 @@ public class EditorConsole : EditorWindow {
 
             EditorGUILayout.EndHorizontal ();
 
-            if (selectedLog != null && loggerModel.logs.Contains(selectedLog)) {
+            if (selectedLog != null && loggerModel.logs.Contains(selectedLog) && !noStack) {
                 EditorGUILayout.BeginHorizontal (GUILayout.Height (position.height * 1 / 5));
                 stackScroll = EditorGUILayout.BeginScrollView (stackScroll);
 
@@ -398,6 +417,8 @@ public class EditorConsole : EditorWindow {
         currentConsoleCommand = EditorGUILayout.TextField (currentConsoleCommand, GUILayout.Height(CONSOLE_HEIGHT));
 
         EditorGUILayout.EndVertical ();
+        
+        Repaint ();
     }
 
     #region General helpers
