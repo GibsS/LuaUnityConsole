@@ -117,8 +117,13 @@ public class ConsoleModel {
             return uri;
         } else {
             if (scriptBase == null) {
-                printError ("No script root initialized");
-                return null;
+#if UNITY_IOS
+                return Application.dataPath + "/Raw/" + uri;
+#elif UNITY_ANDROID
+                return "jar:file://" + Application.dataPath + "!/assets/" + uri;
+#else
+                return Application.dataPath + "/StreamingAssets/" + uri;
+#endif
             } else {
                 return scriptBase + '/' + uri;
             }
@@ -138,9 +143,9 @@ public class ConsoleModel {
             onRunCurrent ();
         }
     }
-    #endregion
+#endregion
     
-    #region Commands
+#region Commands
 
     public void runCurrentCommand (List<string> currentConsoleCode, string currentConsoleCommand, ref int parDepth, ref int acoDepth) {
         int If = Regex.Matches(currentConsoleCommand, @"([\n\ \t]|^)if([\n\ \t]|$)").Count;
@@ -266,9 +271,9 @@ public class ConsoleModel {
         }
     }
 
-    #endregion
+#endregion
 
-    #region UI Command
+#region UI Command
 
     public void showEditor() { if(onShowEditor != null) { onShowEditor (); } }
     public void hideEditor () { if(onHideEditor != null) { onHideEditor (); } }
@@ -278,9 +283,9 @@ public class ConsoleModel {
     public void showLog () { if (onShowLog != null) { onShowLog (); } }
     public void hideLog () { if (onHideLog != null) { onHideLog (); } }
 
-    #endregion
+#endregion
 
-    #region Registration
+#region Registration
 
     void registerAllCommands () {
         registerCommand ("show_log", "showLog");
@@ -316,14 +321,14 @@ public class ConsoleModel {
         runString (@"import '" + ns + @"'");
     }
 
-    #endregion
+#endregion
 
-    #region Helpers
+#region Helpers
     
     static string FormatException (NLua.Exceptions.LuaException e) {
         string source = (string.IsNullOrEmpty(e.Source)) ? "<no source>" : e.Source.Substring(0, e.Source.Length - 2);
         return string.Format ("{0}\nLua (at {2})", e.Message, string.Empty, source);
     }
 
-    #endregion
+#endregion
 }
