@@ -240,9 +240,9 @@ public class ConsoleModel {
         }
     }
     public void newPrint (string msg) {
-        history.Add (msg);
+        history.Add (msg.Replace('\n', ' '));
         if (onNewMessage != null) {
-            onNewMessage (msg);
+            onNewMessage (msg.Replace ('\n', ' '));
         }
     }
 

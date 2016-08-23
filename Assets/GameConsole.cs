@@ -60,7 +60,7 @@ public class GameConsole : MonoBehaviour {
     bool newLog;
 
     void Start () {
-        consoleModel = LuaConsole.getGameConsoleModel ();
+        consoleModel = Shell.getGameConsoleModel ();
         consoleModel.enable ();
         //model.onClear += 
         consoleModel.onHideConsole += hideConsole;
@@ -152,7 +152,7 @@ public class GameConsole : MonoBehaviour {
 
             // Log history
             if (showLuaLog) {
-                LoggerModel logger = LuaConsole.getLoggerModel ();
+                LoggerModel logger = Shell.getLoggerModel ();
                 if(logger != loggerModel) {
                     if (loggerModel != null) {
                         foreach (Log log in loggerModel.logs) {

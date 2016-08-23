@@ -67,6 +67,11 @@ public class EditorConsole : EditorWindow {
     [SerializeField]
     bool noStack;
 
+    [SerializeField]
+    string search;
+
+    [SerializeField]
+    int toConsole;
     //[SerializeField]
     //bool enterDown;
     //[SerializeField]
@@ -90,11 +95,12 @@ public class EditorConsole : EditorWindow {
     }
     void OnEnable () {
         if (consoleModel == null) {
-            consoleModel = LuaConsole.getEditorConsoleModel ();
-            loggerModel = LuaConsole.getLoggerModel ();
+            consoleModel = Shell.getEditorConsoleModel ();
+            loggerModel = Shell.getLoggerModel ();
             historyRank = -1;
             commandSave = null;
             currentConsoleCode = new List<string> ();
+            search = "";
         }
         consoleModel.enable ();
 
@@ -128,6 +134,12 @@ public class EditorConsole : EditorWindow {
     }
 
     void OnGUI() {
+        if (toConsole > 0) {
+            EditorGUI.FocusTextInControl ("console");
+            currentConsoleCommand = "";
+            toConsole--;
+        }
+
         int historyCount = consoleModel.history.Count;
         int logCount = loggerModel.logs.Count;
         if (Event.current.keyCode == KeyCode.Return && Event.current.type == EventType.KeyUp) {// && !enterDown) {
@@ -138,6 +150,7 @@ public class EditorConsole : EditorWindow {
             historyRank = -1;
             commandSave = null;
 
+            toConsole = 2;
         }
         //if (Event.current.keyCode == KeyCode.Return && Event.current.type == EventType.KeyUp) {
         //    enterDown = false;
@@ -187,14 +200,14 @@ public class EditorConsole : EditorWindow {
         GUIStyle errorPrint = new GUIStyle();
         errorPrint.normal.textColor = new Color (1, 0.3f, 0.3f);
 
-        LuaConsole.setLoggerModel (loggerModel);
+        Shell.setLoggerModel (loggerModel);
 
         if (consoleModel == null) {
             OnEnable ();
         }
 
         // TOOLBAR
-        EditorGUILayout.BeginHorizontal (EditorStyles.toolbar);
+        EditorGUILayout.BeginHorizontal (GUI.skin.FindStyle ("Toolbar"));
 
         showHistory = GUILayout.Toggle (showHistory, "History", EditorStyles.toolbarButton);
         showLog = GUILayout.Toggle (showLog, "Log", EditorStyles.toolbarButton);
@@ -209,6 +222,11 @@ public class EditorConsole : EditorWindow {
         GUILayout.FlexibleSpace ();
 
         if (showLog) {
+            search = GUILayout.TextField (search, GUI.skin.FindStyle ("ToolbarSeachTextField"), GUILayout.Width(250));
+            if (GUILayout.Button ("", GUI.skin.FindStyle ("ToolbarSeachCancelButton"))) {
+                search = "";
+            }
+            GUILayout.Space (10);
             for (int i = 0; i < loggerModel.typeOn.Length; i++) {
                 bool tmp = GUILayout.Toggle (loggerModel.typeOn[i], loggerModel.logTypeNames[i], EditorStyles.toolbarButton);
                 if(tmp && !loggerModel.typeOn[i]) {
@@ -254,7 +272,7 @@ public class EditorConsole : EditorWindow {
             EditorGUILayout.BeginVertical (GUILayout.Width (historyWidth), GUILayout.Height (position.height - 60));
 
             historyScroll = GUILayout.BeginScrollView (historyScroll);
-            for (int i = 0; i < historyCount; i++) {
+            for (int i = 0; i < Mathf.Min(consoleModel.history.Count, historyCount); i++) {
                 if (i % 2 == 0) {
                     EditorGUILayout.BeginHorizontal (gray1);
                 } else {
@@ -288,7 +306,7 @@ public class EditorConsole : EditorWindow {
             logScroll = GUILayout.BeginScrollView (logScroll);
             int i = 0;
             foreach (Log log in loggerModel.getLogs ()) {
-                if (i < logCount) {
+                if (i < logCount && (string.IsNullOrEmpty(search) || log.msg.Contains(search))) {
                     if (log == selectedLog) {
                         EditorGUILayout.BeginHorizontal (selected);
                     } else if (log == hoverLog) {

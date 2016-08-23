@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
-public class LuaConsole {
+public class Shell {
 
     static bool isInit;
 
@@ -15,7 +15,7 @@ public class LuaConsole {
     static ConsoleModel consoleModel;
 
     public static void setLoggerModel(LoggerModel loggerModel) {
-        LuaConsole.loggerModel = loggerModel;
+        Shell.loggerModel = loggerModel;
     }
     public static LoggerModel getLoggerModel() {
         if(loggerModel == null) {

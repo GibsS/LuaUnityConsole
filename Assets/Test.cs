@@ -6,22 +6,22 @@ public class Test : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        LuaConsole.init ();
-        LuaConsole.setScriptRoot (Application.dataPath + "/TestScript");
+        Shell.init ();
+        Shell.setScriptRoot (Application.dataPath + "/TestScript");
 
         StartCoroutine (test ());
 
-        LuaConsole.info ("in g");
+        Shell.info ("in g");
         f ();
 	}
 
     IEnumerator test () {
         while(true) {
-            LuaConsole.info ("test");
+            Shell.info ("test");
             yield return new WaitForSeconds (1);
-            LuaConsole.info ("test", this);
+            Shell.info ("test", this);
             yield return new WaitForSeconds (1);
-            LuaConsole.info ("test", this, "network");
+            Shell.info ("test", this, "network");
             yield return new WaitForSeconds (1);
             Debug.Log ("un message unity");
         }
@@ -31,6 +31,6 @@ public class Test : MonoBehaviour {
         g ();
     }
     void g() {
-        LuaConsole.info ("in g");
+        Shell.info ("in g");
     }
 }
