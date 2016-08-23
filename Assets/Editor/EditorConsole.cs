@@ -72,12 +72,10 @@ public class EditorConsole : EditorWindow {
 
     [SerializeField]
     int toConsole;
-    //[SerializeField]
-    //bool enterDown;
-    //[SerializeField]
-    //bool upDown;
-    //[SerializeField]
-    //bool downDown;
+    [SerializeField]
+    string newCommand;
+    [SerializeField]
+    int toNewCommand;
 
     int windowCount { get { return (showEditor ? 1 : 0) + (showHistory ? 1 : 0) + (showLog ? 1 : 0); } }
     int editorWidth { get { return (int) (position.width / windowCount); } }
@@ -134,7 +132,7 @@ public class EditorConsole : EditorWindow {
     }
 
     void OnGUI() {
-        if (toConsole > 0) {
+        if (toConsole > 0) { // fix : when the user presses enter on a label field, the focus is lost, this peace of code ensures the focus is returned
             EditorGUI.FocusTextInControl ("console");
             currentConsoleCommand = "";
             toConsole--;
@@ -142,9 +140,7 @@ public class EditorConsole : EditorWindow {
 
         int historyCount = consoleModel.history.Count;
         int logCount = loggerModel.logs.Count;
-        if (Event.current.keyCode == KeyCode.Return && Event.current.type == EventType.KeyUp) {// && !enterDown) {
-            //Debug.Log ("Event type : " + Event.current.type);
-            //enterDown = true;
+        if (Event.current.keyCode == KeyCode.Return && Event.current.type == EventType.KeyUp) {
             consoleModel.runCurrentCommand (currentConsoleCode, currentConsoleCommand, ref parDepth, ref acoDepth);
             currentConsoleCommand = "";
             historyRank = -1;
@@ -152,20 +148,14 @@ public class EditorConsole : EditorWindow {
 
             toConsole = 2;
         }
-        //if (Event.current.keyCode == KeyCode.Return && Event.current.type == EventType.KeyUp) {
-        //    enterDown = false;
-        //}
 
-        //if (Event.current.keyCode == KeyCode.UpArrow && Event.current.type == EventType.KeyUp) {
-        //    //Debug.Log ("up before : " + historyRank + " " + currentConsoleCommand);
-        //    consoleModel.getPreviousCommand (ref historyRank, ref currentConsoleCommand, ref commandSave);
-        //    //Debug.Log ("up after : " + historyRank + " " + currentConsoleCommand);
-        //} else if (Event.current.keyCode == KeyCode.DownArrow && Event.current.type == EventType.KeyUp) {
-        //    //Debug.Log ("down before : " + historyRank + " " + currentConsoleCommand);
-        //    consoleModel.getNextCommand (ref historyRank, ref currentConsoleCommand, ref commandSave);
-        //    //Debug.Log ("down after : " + historyRank + " " + currentConsoleCommand);
-        //}
-        //EditorGUI.FocusTextInControl ("console");
+        if (Event.current.keyCode == KeyCode.UpArrow && Event.current.type == EventType.KeyUp) {
+            Debug.Log ("up before : " + historyRank + " " + currentConsoleCommand);
+            consoleModel.getPreviousCommand (ref historyRank, ref currentConsoleCommand, ref commandSave);
+        } else if (Event.current.keyCode == KeyCode.DownArrow && Event.current.type == EventType.KeyUp) {
+            Debug.Log ("down before : " + historyRank + " " + currentConsoleCommand);
+            consoleModel.getNextCommand (ref historyRank, ref currentConsoleCommand, ref commandSave);
+        }
 
         noStack = false;
 

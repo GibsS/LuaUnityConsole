@@ -200,6 +200,7 @@ public class Shell {
                     .Skip (2)
                     .ToList ();
     }
+
     public static void info (string msg) {
         if(loggerModel != null) {
             loggerModel.addLog (new Log (LogType.info, null, "Default", msg, formatStack(Environment.StackTrace)));
@@ -213,6 +214,70 @@ public class Shell {
     public static void info (string msg, object target, string channel) {
         if (loggerModel != null) {
             loggerModel.addLog (new Log (LogType.info, target, channel, msg, formatStack (Environment.StackTrace)));
+        }
+    }
+
+    public static void error (string msg) {
+        if (loggerModel != null) {
+            loggerModel.addLog (new Log (LogType.error, null, "Default", msg, formatStack (Environment.StackTrace)));
+        }
+    }
+    public static void error (string msg, object target) {
+        if (loggerModel != null) {
+            loggerModel.addLog (new Log (LogType.error, target, "Default", msg, formatStack (Environment.StackTrace)));
+        }
+    }
+    public static void error (string msg, object target, string channel) {
+        if (loggerModel != null) {
+            loggerModel.addLog (new Log (LogType.error, target, channel, msg, formatStack (Environment.StackTrace)));
+        }
+    }
+
+    public static void warning (string msg) {
+        if (loggerModel != null) {
+            loggerModel.addLog (new Log (LogType.info, null, "Default", msg, formatStack (Environment.StackTrace)));
+        }
+    }
+    public static void warning (string msg, object target) {
+        if (loggerModel != null) {
+            loggerModel.addLog (new Log (LogType.info, target, "Default", msg, formatStack (Environment.StackTrace)));
+        }
+    }
+    public static void warning (string msg, object target, string channel) {
+        if (loggerModel != null) {
+            loggerModel.addLog (new Log (LogType.info, target, channel, msg, formatStack (Environment.StackTrace)));
+        }
+    }
+
+    public static void exception (string msg) {
+        if (loggerModel != null) {
+            loggerModel.addLog (new Log (LogType.exception, null, "Default", msg, formatStack (Environment.StackTrace)));
+        }
+    }
+    public static void exception (string msg, object target) {
+        if (loggerModel != null) {
+            loggerModel.addLog (new Log (LogType.exception, target, "Default", msg, formatStack (Environment.StackTrace)));
+        }
+    }
+    public static void exception (string msg, object target, string channel) {
+        if (loggerModel != null) {
+            loggerModel.addLog (new Log (LogType.exception, target, channel, msg, formatStack (Environment.StackTrace)));
+        }
+    }
+
+    public static void test (string msg) {
+        if (loggerModel != null) {
+            loggerModel.addLog (new Log (LogType.test, null, "Default", msg, formatStack (Environment.StackTrace)));
+        }
+    }
+    public static void test (string msg, object target) {
+        if (loggerModel != null) {
+            loggerModel.addLog (new Log (LogType.test, target, "Default", msg, formatStack (Environment.StackTrace)));
+        }
+    }
+    public static void test (string msg, object target, string channel) {
+        if (loggerModel != null) {
+            loggerModel.addLog (new Log (LogType.test, target, channel, msg, formatStack (Environment.StackTrace)));
         }
     }
 }
