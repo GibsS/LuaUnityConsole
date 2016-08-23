@@ -1,5 +1,3 @@
-Currently being updated, this README is out of date.
-
 # LuaUnityConsole
 A simple lua console for Unity3D that uses Mervill's Integration of NLua to Unity3D 
 (https://github.com/Mervill/Unity3D-NLua)
@@ -8,25 +6,27 @@ This can be a practical tool, whether you want to implement simple debugging fun
 object spawning and teleportation or if you want to implement quick and dirty first version of features 
 to come such as scene selection or character stat evolution.
 
+It also comes with a "in editor" console that provides similar features.
+
 # How to setup
 
 1. Download the repository in your asset folder
-2. Add the LuaConsole.cs script to one of the GameObject
-3. If need be, configure the console by calling LuaConsole's functions :
+2. Add the GameConsole.cs MonoBehaviour on one of the GameObjects
+3. If need be, configure the console by calling Shell's functions :
 ```cs
-LuaConsole console = LuaConsole.luaConsole;
+// Shell is a static class that serves as a facade to every functionality
+Shell.registerObject("some_name", some_obj);
+Shell.registerGameObject(some_go);
+Shell.registerNamespace("System.IO");
 
-console.registerObject("some_name", some_obj);
-console.registerGameObject(some_go);
-console.registerNamespace("System.IO");
-
-// register the default location where scripts are saved
-console.setScriptRoot("Some_absolute_path");
+// register the default location where scripts are saved, if this is not called, it will default to the path to
+// streaming assets
+Shell.setScriptRoot("Some_absolute_path");
 ```
 
 # "Native" functions
 
-LuaConsole has default functions that allow you to interact with the console :
+LuaConsole has default functions that allow you to interact with the console from the lua code :
 
 ```lua
 print 'some stuff'
@@ -48,7 +48,34 @@ run 'Some_path'   -- Runs the script at the given path
 run_editor()      -- Runs the code in the editor
 ```
 
+# Logger
+
+This plugin provides a replacement for the default Unity "Debug" logging mechanism. It hads the concept of channels and allows message to contain more information.
+
+The logger has 5 types of message
+
+* info
+* warning
+* error
+* exception
+* test
+
+For each type, you can log a message using :
+```cs
+Shell.[The type]("Some message")
+Shell.[The type]("Some message", the_calling_object)
+Shell.[The type]("Some message", the_calling_object, "the channel name")
+```
+
+For example, to signal an error pertaining a missing GameObject :
+
+```cs
+Shell.error("The game Object is missing")
+```
+
 # Other features
+
+The plugin has several smaller features, test them out.
 
 ## Multiline command
 
@@ -59,6 +86,10 @@ continue it in the next command.
 ## History
 
 Use up and down arrow to move through past commands.
+
+## Stack analysis
+
+In the editor console, selecting a log will show the call's stack. You can go to the code of every line of the stack.
 
 # Contact
 
