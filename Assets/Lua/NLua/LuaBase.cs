@@ -35,10 +35,8 @@ namespace NLua
 	public abstract class LuaBase : IDisposable
 	{
 		private bool _Disposed;
-		[CLSCompliantAttribute(false)]
 		protected int
 			_Reference;
-		[CLSCompliantAttribute(false)]
 		protected Lua
 			_Interpreter;
 

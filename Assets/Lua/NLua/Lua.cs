@@ -67,7 +67,6 @@ namespace NLua
 	 * - removed all Open*Lib() functions 
 	 * - all libs automatically open in the Lua class constructor (just assign nil to unwanted libs)
 	 * */
-	[CLSCompliant(true)]
 	public class Lua : IDisposable
 	{
 		#region lua debug functions

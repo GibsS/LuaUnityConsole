@@ -342,11 +342,13 @@ namespace NLua
 
 			for (int i = 1; i <= depth; i++) {
 				var type = LuaLib.LuaType (luaState, i);
-				// we dump stacks when deep in calls, calling typename while the stack is in flux can fail sometimes, so manually check for key types
-				string typestr = (type == LuaTypes.Table) ? "table" : LuaLib.LuaTypeName (luaState, type);
-				string strrep = LuaLib.LuaToString (luaState, i).ToString ();
+                // we dump stacks when deep in calls, calling typename while the stack is in flux can fail sometimes, so manually check for key types
+#pragma warning disable 0219
+                string typestr = (type == LuaTypes.Table) ? "table" : LuaLib.LuaTypeName (luaState, type);
+                string strrep = LuaLib.LuaToString (luaState, i).ToString ();
+#pragma warning restore 0219
 
-				if (type == LuaTypes.UserData) {
+                if (type == LuaTypes.UserData) {
 					object obj = translator.GetRawNetObject (luaState, i);
 					strrep = obj.ToString ();
 				}

@@ -155,10 +155,10 @@ public class EditorConsole : EditorWindow {
         }
 
         if (Event.current.keyCode == KeyCode.UpArrow && Event.current.type == EventType.KeyUp) {
-            Debug.Log ("up before : " + historyRank + " " + currentConsoleCommand);
+            Debug.Log ("up");
             consoleModel.getPreviousCommand (ref historyRank, ref currentConsoleCommand, ref commandSave);
         } else if (Event.current.keyCode == KeyCode.DownArrow && Event.current.type == EventType.KeyUp) {
-            Debug.Log ("down before : " + historyRank + " " + currentConsoleCommand);
+            Debug.Log ("down");
             consoleModel.getNextCommand (ref historyRank, ref currentConsoleCommand, ref commandSave);
         }
 
@@ -348,7 +348,6 @@ public class EditorConsole : EditorWindow {
                             string file;
                             int line;
                             log.getLineAndFile (out line, out file);
-                            //Debug.Log(file + " " + line);
                             if (line >= 0) {
                                 UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal (file, line);
                             }
@@ -395,7 +394,6 @@ public class EditorConsole : EditorWindow {
                             string file;
                             int line;
                             selectedLog.getLineAndFile (j, out line, out file);
-                            //Debug.Log(file + " " + line);
                             if (line >= 0) {
                                 UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal (file, line);
                             }

@@ -235,17 +235,17 @@ public class Shell {
 
     public static void warning (string msg) {
         if (loggerModel != null) {
-            loggerModel.addLog (new Log (LogType.info, null, "Default", msg, formatStack (Environment.StackTrace)));
+            loggerModel.addLog (new Log (LogType.warning, null, "Default", msg, formatStack (Environment.StackTrace)));
         }
     }
     public static void warning (string msg, object target) {
         if (loggerModel != null) {
-            loggerModel.addLog (new Log (LogType.info, target, "Default", msg, formatStack (Environment.StackTrace)));
+            loggerModel.addLog (new Log (LogType.warning, target, "Default", msg, formatStack (Environment.StackTrace)));
         }
     }
     public static void warning (string msg, object target, string channel) {
         if (loggerModel != null) {
-            loggerModel.addLog (new Log (LogType.info, target, channel, msg, formatStack (Environment.StackTrace)));
+            loggerModel.addLog (new Log (LogType.warning, target, channel, msg, formatStack (Environment.StackTrace)));
         }
     }
 

@@ -16,10 +16,8 @@ public class GameConsoleEditor : Editor {
 
         bool newShowLog = EditorGUILayout.Toggle("show log", console.showLuaLog);
         if (newShowLog && !console.showLuaLog) {
-            Debug.Log ("show log");
             console.showLog ();
         } else if (!newShowLog && console.showLuaLog) {
-            Debug.Log ("hide log");
             console.hideLog ();
         }
 

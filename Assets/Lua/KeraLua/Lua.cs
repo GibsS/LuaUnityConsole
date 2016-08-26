@@ -155,8 +155,7 @@ namespace KeraLua
 		{
 			NativeMethods.LuaRawSetI (luaState, tableIndex, index);
 		}
-
-		[CLSCompliantAttribute (false)]
+        
 		public static IntPtr LuaNewUserData (IntPtr luaState, uint size)
 		{
 			return NativeMethods.LuaNewUserData (luaState, size);
@@ -226,8 +225,7 @@ namespace KeraLua
 		{
 			return NativeMethods.LuaToBoolean (luaState, index);
 		}
-
-		[CLSCompliantAttribute (false)]
+        
 		public static CharPtr LuaToLString (IntPtr luaState, int index, out uint strLen)
 		{
 			return NativeMethods.LuaToLString (luaState, index, out strLen);
@@ -254,8 +252,7 @@ namespace KeraLua
 		{
 			NativeMethods.LuaPushBoolean (luaState, value);
 		}
-
-		[CLSCompliantAttribute (false)]
+        
 		public static void LuaNetPushLString (IntPtr luaState, string str, uint size)
 		{
 			NativeMethods.LuaNetPushLString (luaState, str, size);
@@ -285,15 +282,13 @@ namespace KeraLua
 		{
 			return NativeMethods.LuaLGetMetafield (luaState, stackPos, field);
 		}
-
-		[CLSCompliantAttribute (false)]
+        
 		public static int LuaNetLoadBuffer (IntPtr luaState, string buff, uint size, string name)
 		{
 			return NativeMethods.LuaNetLoadBuffer (luaState, buff, size, name);
 
 		}
-
-		[CLSCompliantAttribute (false)]
+        
 		public static int LuaNetLoadBuffer (IntPtr luaState, byte [] buff, uint size, string name)
 		{
 			return NativeMethods.LuaNetLoadBuffer (luaState, buff, size, name);
