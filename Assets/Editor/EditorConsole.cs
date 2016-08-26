@@ -77,6 +77,9 @@ public class EditorConsole : EditorWindow {
     [SerializeField]
     int toNewCommand;
 
+    [SerializeField]
+    bool clearOnPlay;
+
     int windowCount { get { return (showEditor ? 1 : 0) + (showHistory ? 1 : 0) + (showLog ? 1 : 0); } }
     int editorWidth { get { return (int) (position.width / windowCount); } }
     int historyWidth { get { return (int) (position.width / windowCount); } }
@@ -89,7 +92,9 @@ public class EditorConsole : EditorWindow {
     }
 
     void onPlayModeChanged () {
-
+        if (clearOnPlay && EditorApplication.isPlayingOrWillChangePlaymode && !EditorApplication.isPlaying) {
+            loggerModel.clear ();
+        }
     }
     void OnEnable () {
         if (consoleModel == null) {
@@ -203,6 +208,8 @@ public class EditorConsole : EditorWindow {
         showLog = GUILayout.Toggle (showLog, "Log", EditorStyles.toolbarButton);
         showEditor = GUILayout.Toggle (showEditor, "Editor", EditorStyles.toolbarButton);
 
+        GUILayout.Space (10);
+
         showAll = showEditor && showHistory && showLog;
         bool newShowAll = GUILayout.Toggle (showAll, "Show all", EditorStyles.toolbarButton);
         if(newShowAll != showAll) {
@@ -210,20 +217,18 @@ public class EditorConsole : EditorWindow {
         }
 
         GUILayout.FlexibleSpace ();
-
-        if (showLog) {
-            search = GUILayout.TextField (search, GUI.skin.FindStyle ("ToolbarSeachTextField"), GUILayout.Width(250));
-            if (GUILayout.Button ("", GUI.skin.FindStyle ("ToolbarSeachCancelButton"))) {
-                search = "";
-            }
-            GUILayout.Space (10);
-            for (int i = 0; i < loggerModel.typeOn.Length; i++) {
-                bool tmp = GUILayout.Toggle (loggerModel.typeOn[i], loggerModel.logTypeNames[i], EditorStyles.toolbarButton);
-                if(tmp && !loggerModel.typeOn[i]) {
-                    loggerModel.enableType ((LogType)i);
-                } else if(!tmp && loggerModel.typeOn[i]) {
-                    loggerModel.disableType ((LogType) i);
-                }
+        
+        search = GUILayout.TextField (search, GUI.skin.FindStyle ("ToolbarSeachTextField"), GUILayout.Width(250));
+        if (GUILayout.Button ("", GUI.skin.FindStyle ("ToolbarSeachCancelButton"))) {
+            search = "";
+        }
+        GUILayout.Space (10);
+        for (int i = 0; i < loggerModel.typeOn.Length; i++) {
+            bool tmp = GUILayout.Toggle (loggerModel.typeOn[i], loggerModel.logTypeNames[i], EditorStyles.toolbarButton);
+            if(tmp && !loggerModel.typeOn[i]) {
+                loggerModel.enableType ((LogType)i);
+            } else if(!tmp && loggerModel.typeOn[i]) {
+                loggerModel.disableType ((LogType) i);
             }
         }
 
@@ -232,23 +237,22 @@ public class EditorConsole : EditorWindow {
         EditorGUILayout.BeginHorizontal (EditorStyles.toolbar);
 
         GUILayout.FlexibleSpace ();
-
-        if (showLog) {
-            foreach(string channel in loggerModel.channels) {
-                bool oldVal = loggerModel.visibleChannels.Contains(channel);
-                bool newVal = GUILayout.Toggle (oldVal, channel, EditorStyles.toolbarButton);
-                if (newVal && !oldVal) {
-                    loggerModel.enableChannel (channel);
-                } else if (!newVal && oldVal) {
-                    loggerModel.disableChannel (channel);
-                }
+        
+        foreach(string channel in loggerModel.channels) {
+            bool oldVal = loggerModel.visibleChannels.Contains(channel);
+            bool newVal = GUILayout.Toggle (oldVal, channel, EditorStyles.toolbarButton);
+            if (newVal && !oldVal) {
+                loggerModel.enableChannel (channel);
+            } else if (!newVal && oldVal) {
+                loggerModel.disableChannel (channel);
             }
+        }
 
-            GUILayout.Space (10);
+        GUILayout.Space (10);
 
-            if(GUILayout.Button("Clear", EditorStyles.toolbarButton)) {
-                loggerModel.clear ();
-            }
+        clearOnPlay = GUILayout.Toggle (clearOnPlay, "Clear on play", EditorStyles.toolbarButton);
+        if (GUILayout.Button("Clear", EditorStyles.toolbarButton)) {
+            loggerModel.clear ();
         }
 
         EditorGUILayout.EndHorizontal ();
@@ -430,6 +434,7 @@ public class EditorConsole : EditorWindow {
     }
 
     #region General helpers
+
     private Texture2D MakeTex (int width, int height, Color col) {
         Color[] pix = new Color[width * height];
 
@@ -442,5 +447,6 @@ public class EditorConsole : EditorWindow {
 
         return result;
     }
+    
     #endregion
 }

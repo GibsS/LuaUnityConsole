@@ -59,6 +59,9 @@ public class LoggerModel {
                 logType = LogType.exception;
                 break;
             case UnityEngine.LogType.Warning:
+                if(logs.Find(log => log.msg == condition) != null) {
+                    return;
+                }
                 logType = LogType.warning;
                 break;
             case UnityEngine.LogType.Log:
