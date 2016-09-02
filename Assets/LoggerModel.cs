@@ -21,11 +21,13 @@ public class LoggerModel {
     public event OnChannelChange onChannelChange;
 
     const int MAX_HISTORY = 500;
-    const int AVERAGE_HISTORY = 300;
-    
+    const int AVERAGE_HISTORY = 400;
+
     [SerializeField]
-    public List<Log> logs { get; private set; }
-    
+    public List<Log> logs;
+    [SerializeField]
+    public List<Log> displayedLogs { get; private set; }
+
     [SerializeField]
     public List<string> channels { get; private set; }
     [SerializeField]
@@ -38,6 +40,7 @@ public class LoggerModel {
 
     public LoggerModel() {
         logs = new List<Log> ();
+        displayedLogs = new List<Log> ();
         channels = new List<string> ();
         visibleChannels = new List<string> ();
         typeOn = new bool[Enum.GetValues(typeof(LogType)).Length];
@@ -81,8 +84,12 @@ public class LoggerModel {
         }
 
         logs.Add (log);
-        if(logs.Count > MAX_HISTORY) {
+        if ((log.channel == "" || visibleChannels.Contains (log.channel)) && typeOn[(int) log.type]) {
+            displayedLogs.Add (log);
+        }
+        if (logs.Count > MAX_HISTORY) {
             logs.RemoveRange (0, logs.Count - AVERAGE_HISTORY);
+            recalculateDisplayedLogs ();
         }
         if(onLog != null) {
             onLog (log);
@@ -90,38 +97,45 @@ public class LoggerModel {
     }
     public void clear() {
         logs.Clear ();
+        displayedLogs.Clear ();
         if(onClear != null) {
             onClear ();
         }
     }
-    public IEnumerable getLogs() {
-        foreach(Log log in logs) {
+    void recalculateDisplayedLogs () {
+        displayedLogs.Clear ();
+
+        foreach (Log log in logs) {
             if ((log.channel == "" || visibleChannels.Contains(log.channel)) && typeOn[(int) log.type]) {
-                yield return log;
+                displayedLogs.Add (log);
             }
         }
     }
 
     public void enableType(LogType type) {
         typeOn[(int) type] = true;
-        if(onTypeChange != null) {
+        recalculateDisplayedLogs ();
+        if (onTypeChange != null) {
             onTypeChange (type, true);
         }
     }
     public void disableType(LogType type) {
         typeOn[(int) type] = false;
+        recalculateDisplayedLogs ();
         if (onTypeChange != null) {
             onTypeChange (type, false);
         }
     }
     public void enableChannel(string channel) {
         visibleChannels.Add (channel);
+        recalculateDisplayedLogs ();
         if (onTypeChange != null) {
             onChannelChange (channel, true);
         }
     }
     public void disableChannel(string channel) {
         visibleChannels.Remove (channel);
+        recalculateDisplayedLogs ();
         if (onTypeChange != null) {
             onChannelChange (channel, true);
         }

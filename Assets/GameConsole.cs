@@ -153,7 +153,7 @@ public class GameConsole : MonoBehaviour {
             // Log history
             if (showLuaLog) {
                 LoggerModel logger = Shell.getLoggerModel ();
-                if(logger != loggerModel) {
+                if (logger != loggerModel) {
                     if (loggerModel != null) {
                         foreach (Log log in loggerModel.logs) {
                             logger.addLog (log);
@@ -164,13 +164,13 @@ public class GameConsole : MonoBehaviour {
                     loggerModel.onHide += (() => showLuaLog = false);
                     loggerModel.onShow += (() => showLuaLog = true);
                 }
-                logScroll = GUI.BeginScrollView (logBox, logScroll, new Rect (0, 0, logBox.width, logger.logs.Count * HISTORY_LABEL_HEIGHT), GUIStyle.none, GUIStyle.none);
-                for (int i = 0; i < logger.logs.Count; i++) {
+                logScroll = GUI.BeginScrollView (logBox, logScroll, new Rect (0, 0, logBox.width, logger.displayedLogs.Count * HISTORY_LABEL_HEIGHT), GUIStyle.none, GUIStyle.none);
+                for (int i = 0; i < logger.displayedLogs.Count; i++) {
                     Log log = logger.logs[i];
                     GUI.Label (new Rect (0, i * HISTORY_LABEL_HEIGHT, logBox.width, HISTORY_LABEL_HEIGHT), log.ToString());
                 }
 
-                if(newLog) {
+                if (newLog) {
                     logScroll.y = float.PositiveInfinity;
                     newLog = false;
                 }

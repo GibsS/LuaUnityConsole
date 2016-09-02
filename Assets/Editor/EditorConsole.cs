@@ -299,7 +299,7 @@ public class EditorConsole : EditorWindow {
 
             logScroll = GUILayout.BeginScrollView (logScroll);
             int i = 0;
-            foreach (Log log in loggerModel.getLogs ()) {
+            foreach (Log log in loggerModel.displayedLogs) {
                 if (i < logCount && (string.IsNullOrEmpty(search) || log.msg.Contains(search))) {
                     if (log == selectedLog) {
                         EditorGUILayout.BeginHorizontal (selected);
